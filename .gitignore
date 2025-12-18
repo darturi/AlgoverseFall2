@@ -1,4 +1,4 @@
 .env
-data/*
+data/test/test_raw/*
 .idea/
 chroma_db/
