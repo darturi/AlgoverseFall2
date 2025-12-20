@@ -2,7 +2,7 @@
 
 # GLOBAL
 PATIENT_NAMES = ["PATIENT"]
-THERAPIST_NAMES = ["THERAPIST"]
+THERAPIST_NAMES = ["THERAPIST", "COUNSELOR"]
 
 # UTILITIES
 def starts_with_selection(target, startswith_list, case_sensitive=True):
@@ -40,7 +40,7 @@ def load_and_split(filename):
     r_list = []
     messages = []
     for line in lines:
-        line = strip_list(line, ["</p>", "<p>", "</p>"])
+        line = line[3:-5]# strip_list(line, ["</p>", "<p>", "</p>", "<p>"])
 
         if starts_with_selection(line, PATIENT_NAMES + THERAPIST_NAMES): # Add counseler
             start_file = True
@@ -67,4 +67,4 @@ def load_and_split(filename):
 
 
 if __name__ == '__main__':
-    load_and_split("/Users/danielarturi/Desktop/PersonalProjects/AlgoverseFall2/data/test/6_1000088056.txt")
+    print(load_and_split("/Users/danielarturi/Desktop/PersonalProjects/AlgoverseFall2/data/test/test_raw/10_1000060894.txt"))

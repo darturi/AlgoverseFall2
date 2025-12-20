@@ -61,7 +61,7 @@ class Mem0Base():
 if __name__ == '__main__':
     test = Mem0Base('test')
 
-    transcript_path = "/Users/danielarturi/Desktop/PersonalProjects/AlgoverseFall2/data/test/test_raw/6_1000088056.txt"
+    transcript_path = "/Users/danielarturi/Desktop/PersonalProjects/AlgoverseFall2/data/test/test_raw/10_1000060894.txt"
 
     test.add_mem_batch(transcript_path)
 
