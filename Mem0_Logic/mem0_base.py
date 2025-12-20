@@ -19,14 +19,39 @@ class Mem0Base():
 
         self.checkpoint_counter = 1
 
-    def add_mem_batch(self, mem_batch):
+    def add_mem_batch(self, mem_batch, batch_size=10):
+        """
+        Add memories in batches to avoid mem0 extraction issues with large conversations.
+
+        Args:
+            mem_batch: Either a file path (str) or list of message dicts
+            batch_size: Number of messages to process at once (default: 20)
+                       Empirically determined - too large (>50) may result in 0 extractions
+
+        Returns:
+            total_memories: Total number of memories extracted
+        """
         if type(mem_batch) == str:
             mem_batch = load_and_split(mem_batch)
 
-        print(type(mem_batch))
-        print(type(mem_batch) is list[dict])
+        print(f"Processing {len(mem_batch)} messages in batches of {batch_size}...")
 
-        return self.memory.add(mem_batch, user_id=USER_ID)
+        total_memories = 0
+        all_results = []
+
+        # Process in batches to avoid mem0 limitations
+        for i in range(0, len(mem_batch), batch_size):
+            batch = mem_batch[i:i+batch_size]
+            result = self.memory.add(batch, user_id=USER_ID)
+            count = len(result.get('results', []))
+            total_memories += count
+            all_results.extend(result.get('results', []))
+            print(f"  Batch {i//batch_size + 1} (messages {i}-{i+len(batch)}): {count} memories extracted")
+
+        print(f"Total memories extracted: {total_memories}")
+
+        print(all_results)
+        return {'total': total_memories, 'results': all_results}
 
     def reset_memory(self, del_checkpoints=True):
         self.memory = Memory()
