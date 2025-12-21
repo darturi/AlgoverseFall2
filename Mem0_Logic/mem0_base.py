@@ -31,7 +31,7 @@ class Mem0Base():
         Returns:
             total_memories: Total number of memories extracted
         """
-        if type(mem_batch) == str:
+        if type(mem_batch) != list:
             mem_batch = load_and_split(mem_batch)
 
         print(f"Processing {len(mem_batch)} messages in batches of {batch_size}...")
@@ -79,19 +79,19 @@ class Mem0Base():
 
         for file_path in dir_path.iterdir():
             if file_path.is_file():
-                self.add_mem_batch("PLACEHOLDER")
+                self.add_mem_batch(file_path)
                 self.export_checkpoint()
                 # print(file_path)
 
 if __name__ == '__main__':
-    test = Mem0Base('test')
+    test = Mem0Base('0518-014')
 
-    transcript_path = "/Users/danielarturi/Desktop/PersonalProjects/AlgoverseFall2/data/test/test_raw/10_1000060894.txt"
+    # transcript_path = "/Users/danielarturi/Desktop/PersonalProjects/AlgoverseFall2/data/test/test_raw/10_1000060894.txt"
 
-    test.add_mem_batch(transcript_path)
+    #test.add_mem_batch(transcript_path)
 
-    test.export_checkpoint()
-    # test.process_all_raw()
+    #test.export_checkpoint()
+    test.process_all_raw()
 
 
 

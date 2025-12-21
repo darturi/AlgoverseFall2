@@ -1,4 +1,5 @@
 .env
 data/test/test_raw/*
+data/0518-014/0518-014_raw/*
 .idea/
 chroma_db/
