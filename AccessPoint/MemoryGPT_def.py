@@ -2,6 +2,7 @@ from util import *
 from tqdm import tqdm
 import torch
 from mem0 import Memory
+from types import SimpleNamespace
 
 BASE_MEM_CONFIG = {
     "vector_store": {
@@ -51,13 +52,17 @@ class MemoryGPTInstance():
 
 
     def query_model(self, query,
-                    temperature=1, top_p=1, max_tokens=600, num_return_sequences=1):
+                    temperature=1, top_p=1, max_tokens=600, num_return_sequences=1, system_prompt=None):
         # Retrieve relevant memories
         memories = self.memory.search(query, user_id=USER_ID)
         context = "\n".join([m['memory'] for m in memories['results']])
 
         # Build messages with memory context
         messages = []
+
+        # Add system prompt if provided
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
 
         # Include memory context in the user message
         if context:
@@ -107,8 +112,17 @@ class MemoryGPTInstance():
             skip_special_tokens=True
         )
 
-        # Return single string if num_return_sequences=1, else list
+        # Return in OpenAI format if num_return_sequences=1, else list
         if num_return_sequences == 1:
-            return responses[0]
+            # Wrap in OpenAI-like response format
+            return SimpleNamespace(
+                choices=[
+                    SimpleNamespace(
+                        message=SimpleNamespace(
+                            content=responses[0]
+                        )
+                    )
+                ]
+            )
         return responses
 
