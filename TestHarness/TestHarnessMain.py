@@ -30,7 +30,8 @@ async def test_checkpoints(
 
         # For each test we want to conduct run a test instance
         for test_file, metrics in question_files.items():
-            SAVE_PATH = save_dir / f"{test_file[:-4]}.csv"
+            suffix = test_file.split('/')[-1]
+            SAVE_PATH = save_dir / f"{suffix[:-4]}.csv"
 
             print('Results will be saved to', SAVE_PATH)
 
