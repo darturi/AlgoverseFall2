@@ -3,6 +3,7 @@ from tqdm import tqdm
 import torch
 from mem0 import Memory
 from types import SimpleNamespace
+import csv
 
 BASE_MEM_CONFIG = {
     "vector_store": {
@@ -19,9 +20,11 @@ class MemoryGPTInstance():
                  checkpoint_path,
                  model_instance,
                  tokenizer,
+                 csv_path,
                  config_start=BASE_MEM_CONFIG,
                  device=None):
         self.checkpoint_path = checkpoint_path
+        self.csv_path = csv_path
 
         # Set device
         if device is None:
@@ -50,12 +53,21 @@ class MemoryGPTInstance():
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
+        # Create CSV file with headers
+        with open(self.csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['query', 'response', 'mem_count', 'memories'])
+
 
     def query_model(self, query,
                     temperature=1, top_p=1, max_tokens=600, num_return_sequences=1, system_prompt=None):
         # Retrieve relevant memories
         memories = self.memory.search(query, user_id=USER_ID)
         context = "\n".join([m['memory'] for m in memories['results']])
+
+        # Store memory information for CSV logging
+        mem_count = len(memories['results'])
+        mem_list = [m['memory'] for m in memories['results']]
 
         # Build messages with memory context
         messages = []
@@ -111,6 +123,14 @@ class MemoryGPTInstance():
             outputs[:, prompt_len:],
             skip_special_tokens=True
         )
+
+        # Log to CSV file
+        with open(self.csv_path, 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            # Log the first response (or all responses concatenated if multiple)
+            response_text = responses[0] if num_return_sequences == 1 else " | ".join(responses)
+            memories_text = " | ".join(mem_list)
+            writer.writerow([query, response_text, mem_count, memories_text])
 
         # Return in OpenAI format if num_return_sequences=1, else list
         if num_return_sequences == 1:
