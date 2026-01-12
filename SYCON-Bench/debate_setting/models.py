@@ -4,6 +4,7 @@ Models module for the debate-setting in SYCON-Bench.
 This module provides classes for different model types used in the debate setting.
 """
 import os
+import sys
 import time
 import torch
 import logging
@@ -12,6 +13,12 @@ from typing import List, Dict, Any, Optional
 from collections import defaultdict
 from abc import ABC, abstractmethod
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+# Add the project root directory to the Python path
+# This ensures AccessPoint can be imported regardless of where the script is run from
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from AccessPoint.MemoryGPT_def import MemoryGPTInstance
 from AccessPoint.SYCON_BenchAccessPoint import SyconBenchAccessPoint

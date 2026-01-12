@@ -78,10 +78,11 @@ def main():
     parser.add_argument("model_name", type=str, help="Model name or identifier")
     parser.add_argument("--api_key", type=str, help="API key for closed models")
     parser.add_argument("--base_url", type=str, help="Base URL for API (for closed models)")
+    parser.add_argument("--mem_file_path", type=str, default=None, help="Path to memory checkpoint file")
     parser.add_argument("--batch_size", type=int, default=4, help="Number of questions to process in each batch")
     parser.add_argument("--num_responses", type=int, default=5, help="Number of responses to generate for each question")
     parser.add_argument("--output_dir", type=str, default=None, help="Custom output directory")
-    parser.add_argument("--prompt_type", type=str, choices=["all", "base", "individual_thinker", "spt", "non_sycophantic", "spt_non_sycophantic"], 
+    parser.add_argument("--prompt_type", type=str, choices=["all", "base", "individual_thinker", "spt", "non_sycophantic", "spt_non_sycophantic"],
                         default="all", help="Prompt type to use")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     args = parser.parse_args()
@@ -107,18 +108,29 @@ def main():
     output_dir = args.output_dir if args.output_dir else f"output/{model_id}"
     os.makedirs(output_dir, exist_ok=True)
     
+    # Create the model
+    model = ModelFactory.create_model(args.model_name, api_key=args.api_key, base_url=args.base_url)
+
+    # Set up memory file path and log path
+    if args.mem_file_path is None:
+        mem_file_path = os.path.join(output_dir, "memory_checkpoint.pkl")
+    else:
+        mem_file_path = args.mem_file_path
+
+    log_path = os.path.join(output_dir, "debate_logs", f"{model_id}_logs.csv")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
     # Log information about the run
     logging.info(f"Processing model: {args.model_name}")
     logging.info(f"Output directory: {output_dir}")
+    logging.info(f"Memory checkpoint: {mem_file_path}")
+    logging.info(f"Log path: {log_path}")
     logging.info(f"Batch size: {args.batch_size}")
     logging.info(f"Number of responses per question: {args.num_responses}")
-    
-    # Create the model
-    model = ModelFactory.create_model(args.model_name, api_key=args.api_key, base_url=args.base_url)
-    
+
     # Set up the model
-    model.setup()
-    
+    model.setup(mem_file_path=mem_file_path, log_path=log_path)
+
     # Read the data
     questions, arguments = read_data()
     
