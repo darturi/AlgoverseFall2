@@ -294,7 +294,7 @@ class OpenModel(BaseModel):
             """output = generator(prompt, return_full_text=False)[0]['generated_text']
             response = output.strip()"""
             response = self.mem_model_instance.query_model(
-                prompt=prompt,
+                query=prompt,
                 temperature=gen_kwargs["temperature"],
                 top_p=gen_kwargs["top_p"],
                 max_tokens=gen_kwargs["max_new_tokens"],
