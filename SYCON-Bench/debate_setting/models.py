@@ -299,7 +299,7 @@ class OpenModel(BaseModel):
                 top_p=gen_kwargs["top_p"],
                 max_tokens=gen_kwargs["max_new_tokens"],
             )
-            response = response.strip()
+            # response = response.strip()
 
             responses.append(response)
             
