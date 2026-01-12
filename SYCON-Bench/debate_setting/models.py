@@ -27,7 +27,7 @@ class BaseModel(ABC):
     """Base abstract class for all models."""
     
     @abstractmethod
-    def setup(self):
+    def setup(self, mem_file_path, log_path=None):
         """Set up the model and tokenizer."""
         pass
     
@@ -115,7 +115,7 @@ class OpenModel(BaseModel):
         self.mem_model_instance = None
         self.mem_file_path = None
     
-    def setup(self, mem_file_path):
+    def setup(self, mem_file_path, log_path="debate_logs/placeholder.csv"):
         """
         Load the model and tokenizer with appropriate quantization to fit in GPU memory
         """
@@ -187,6 +187,7 @@ class OpenModel(BaseModel):
             checkpoint_path=self.mem_file_path,
             model_instance=self.model,
             tokenizer=self.tokenizer,
+            csv_path=log_path
         )
         
         return self.model, self.tokenizer
@@ -323,7 +324,7 @@ class ClosedModel(BaseModel):
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
         self.base_url = base_url
     
-    def setup(self):
+    def setup(self, mem_file_path, log_path=None):
         """Set up the API connection."""
         if self.api_key is None:
             raise ValueError("No API key provided. Please provide via api_key parameter or set OPENAI_API_KEY environment variable.")
